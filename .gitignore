@@ -4,3 +4,4 @@
 /config/credentials/*.key
 
 backend/tmp/cache/bootsnap/*
+backend/.env
