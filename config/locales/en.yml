@@ -28,4 +28,16 @@
 #       enabled: "ON"
 
 en:
-  hello: "Hello world"
+  auth:
+    token_missing: "Authorization token is missing"
+    invalid_token_user: "Invalid token: user not found"
+    user_not_logged_in: "User is not logged in"
+    user_inactive: "User is inactive"
+    token_expired: "Token has expired"
+    invalid_token: "Invalid token"
+    signup_success: "Signup successful"
+    login_required: "Login and password are required"
+    login_success: "Login successful"
+    invalid_credentials: "Invalid credentials"
+  errors:
+    route_not_found: "Route not found"
