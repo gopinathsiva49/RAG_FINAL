@@ -7,3 +7,6 @@ backend/tmp/cache/bootsnap/*
 backend/.env
 health_frontend/node_modules/
 
+health_frontend/node_modules/
+health_frontend/.next/
+health_frontend/dist/
