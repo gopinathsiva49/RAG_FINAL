@@ -4,3 +4,7 @@ health_backend/.env
 health_backend/config/credentials/production.key
 health_backend/config/credentials/production.yml.enc
 health_backend/log/development.log
+
+health_frontend/.env
+health_frontend/.next/*
+health_frontend/out/*
