@@ -10,10 +10,12 @@ export default function SignupPage() {
     firstName: '',
     lastName: '',
     email: '',
+    countryCode: '+91',
     phone: '',
     password: '',
     passwordConfirmation: '',
   })
+
   const [error, setError] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
@@ -27,9 +29,10 @@ export default function SignupPage() {
     e.preventDefault()
     setError('')
 
-    const { firstName, lastName, email, phone, password, passwordConfirmation } = formData
+    const { firstName, lastName, email, countryCode, phone, password, passwordConfirmation } = formData
 
-    if (!firstName || !email || !phone || !password || !passwordConfirmation) {
+    // Basic validations
+    if (!firstName || !email || !password || !passwordConfirmation || !phone) {
       setError('All fields are required')
       return
     }
@@ -44,8 +47,22 @@ export default function SignupPage() {
       return
     }
 
+    if (!/^\d{7,12}$/.test(phone)) {
+      setError("Invalid phone number")
+      return
+    }
+
     setIsLoading(true)
-    const result = await api.signup(firstName, lastName, email, phone, password, passwordConfirmation)
+
+    const result = await api.signup(
+      firstName,
+      lastName,
+      email,
+      `${countryCode}${phone}`,
+      password,
+      passwordConfirmation
+    )
+
     setIsLoading(false)
 
     if (result.error) {
@@ -71,105 +88,103 @@ export default function SignupPage() {
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
+
             {/* First Name */}
             <div>
-              <label htmlFor="firstName" className="block text-sm font-medium text-card-foreground mb-1">
-                First Name
-              </label>
+              <label className="block text-sm font-medium mb-1">First Name</label>
               <input
-                id="firstName"
                 name="firstName"
                 type="text"
                 placeholder="John"
                 value={formData.firstName}
                 onChange={handleChange}
                 disabled={isLoading}
-                className="w-full px-4 py-2 rounded-xl border border-input bg-background text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-50"
+                className="w-full px-4 py-2 rounded-xl border"
               />
             </div>
 
             {/* Last Name */}
             <div>
-              <label htmlFor="lastName" className="block text-sm font-medium text-card-foreground mb-1">
-                Last Name
-              </label>
+              <label className="block text-sm font-medium mb-1">Last Name</label>
               <input
-                id="lastName"
                 name="lastName"
                 type="text"
                 placeholder="Doe"
                 value={formData.lastName}
                 onChange={handleChange}
                 disabled={isLoading}
-                className="w-full px-4 py-2 rounded-xl border border-input bg-background text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-50"
+                className="w-full px-4 py-2 rounded-xl border"
               />
             </div>
 
             {/* Email */}
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-card-foreground mb-1">
-                Email
-              </label>
+              <label className="block text-sm font-medium mb-1">Email</label>
               <input
-                id="email"
                 name="email"
                 type="email"
                 placeholder="you@example.com"
                 value={formData.email}
                 onChange={handleChange}
                 disabled={isLoading}
-                className="w-full px-4 py-2 rounded-xl border border-input bg-background text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-50"
+                className="w-full px-4 py-2 rounded-xl border"
               />
             </div>
 
-            {/* Phone */}
+            {/* Phone Input */}
             <div>
-              <label htmlFor="phone" className="block text-sm font-medium text-card-foreground mb-1">
-                Phone
-              </label>
-              <input
-                id="phone"
-                name="phone"
-                type="tel"
-                placeholder="9962145678"
-                value={formData.phone}
-                onChange={handleChange}
-                disabled={isLoading}
-                className="w-full px-4 py-2 rounded-xl border border-input bg-background text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-50"
-              />
+              <label className="block text-sm font-medium mb-1">Phone</label>
+
+              <div className="flex gap-2">
+                {/* Country Code */}
+                <input
+                  name="countryCode"
+                  type="text"
+                  value={formData.countryCode}
+                  onChange={handleChange}
+                  disabled={isLoading}
+                  className="w-24 px-4 py-2 rounded-xl border"
+                  placeholder="+91"
+                />
+
+                {/* Phone */}
+                <input
+                  name="phone"
+                  type="tel"
+                  placeholder="9876543210"
+                  value={formData.phone}
+                  onChange={handleChange}
+                  disabled={isLoading}
+                  className="flex-1 px-4 py-2 rounded-xl border"
+                />
+              </div>
             </div>
 
             {/* Password */}
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-card-foreground mb-1">
-                Password
-              </label>
+              <label className="block text-sm font-medium mb-1">Password</label>
               <input
-                id="password"
                 name="password"
                 type="password"
-                placeholder="••••••"
+                placeholder=""
                 value={formData.password}
                 onChange={handleChange}
                 disabled={isLoading}
-                className="w-full px-4 py-2 rounded-xl border border-input bg-background text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-50"
+                className="w-full px-4 py-2 rounded-xl border"
               />
             </div>
 
             {/* Password Confirmation */}
             <div>
-              <label htmlFor="passwordConfirmation" className="block text-sm font-medium text-card-foreground mb-1">
-                Confirm Password
-              </label>
+              <label className="block text-sm font-medium mb-1">Confirm Password</label>
               <input
-                id="passwordConfirmation"
                 name="passwordConfirmation"
                 type="password"
-                placeholder="••••••"
+                placeholder=""
                 value={formData.passwordConfirmation}
                 onChange={handleChange}
                 disabled={isLoading}
-                className="w-full px-4 py-2 rounded-xl border border-input bg-background text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-50"
+                className="w-full px-4 py-2 rounded-xl border"
               />
             </div>
 
@@ -177,7 +192,7 @@ export default function SignupPage() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-primary text-primary-foreground py-2 px-4 rounded-xl font-medium hover:bg-primary/90 transition-colors mt-6 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-primary text-white py-2 px-4 rounded-xl font-medium hover:bg-primary/90 mt-6 disabled:opacity-50"
             >
               {isLoading ? 'Creating Account...' : 'Create Account'}
             </button>

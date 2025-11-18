@@ -1,14 +1,33 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
+import { useEffect, useState } from 'react'
+import { api } from '@/lib/api'
 
 export default function Navbar() {
   const router = useRouter()
+  const [error, setError] = useState('')
+  
 
-  const handleLogout = () => {
-    localStorage.removeItem('token')
-    router.push('/')
-  }
+  const handleLogout = async () => {
+      try {
+        const token = localStorage.getItem('token')
+        if (!token) return
+  
+        const result = await api.logout(token)
+  
+        if (result.error) {
+          setError(result.error)
+          return
+        }
+  
+        localStorage.removeItem('token')
+        router.push('/login')
+      } catch (err) {
+        console.error(err)
+        setError('Something went wrong while logging out.')
+      }
+    }
 
   return (
     <nav className="bg-white border-b border-border shadow-sm">

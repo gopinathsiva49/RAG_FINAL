@@ -6,6 +6,15 @@ interface ApiResponse<T> {
   message?: string
 }
 
+function handleUnauthorized(response: Response) {
+  if (response.status === 401) {
+    localStorage.removeItem("token");
+    window.location.href = "/login";
+    return true;
+  }
+  return false;
+}
+
 export const api = {
   async signup(firstName: string, lastName: string, email: string, phone: string, password: string, passwordConfirmation: string): Promise<ApiResponse<{ token: string }>> {
     try {
@@ -23,11 +32,13 @@ export const api = {
           }
         }),
       })
+
+      if (handleUnauthorized(response)) return {}
+
       const data = await response.json()
-      if (!response.ok) {
-        return { error: data.message || 'Signup failed' }
-      }
+      if (!response.ok) return { error: data.errors || 'Signup failed' }
       return { data }
+
     } catch (error) {
       return { error: 'Network error. Please try again.' }
     }
@@ -40,11 +51,12 @@ export const api = {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
       })
+
       const data = await response.json()
-      if (!response.ok) {
-        return { error: data.message || 'Login failed' }
-      }
+
+      if (!response.ok) return { error: data.error || 'Login failed' }
       return { data }
+
     } catch (error) {
       return { error: 'Network error. Please try again.' }
     }
@@ -60,11 +72,14 @@ export const api = {
         },
         body: JSON.stringify({ query }),
       })
+
+      if (handleUnauthorized(response)) return {}
+
       const data = await response.json()
-      if (!response.ok) {
-        return { error: data.message || 'Search failed' }
-      }
+      if (!response.ok) return { error: data.message || 'Search failed' }
+
       return { data: data.answer ? { response: data.answer } : undefined, message: data.message }
+
     } catch (error) {
       return { error: 'Network error. Please try again.' }
     }
@@ -72,20 +87,34 @@ export const api = {
 
   async logout(token: string): Promise<ApiResponse<{ response: string }>> {
     try {
-      const response = await fetch(`${API_BASE_URL}/search`, {
+      const response = await fetch(`${API_BASE_URL}/auth/logout`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `${token}`,
         },
       })
-      const data = await response.json()
-      if (!response.ok) {
-        return { error: data.message || 'Search failed' }
+
+      if (handleUnauthorized(response)) return {}
+
+      if (response.status === 204) {
+        return { data: { response: "Logout successful" }, message: "Logout successful" }
       }
-      return { data: data.answer ? { response: data.answer } : undefined, message: data.message }
+
+      let data = {}
+      try {
+        data = await response.json()
+      } catch { }
+
+      if (!response.ok) return { error: (data as any).message || "Logout failed" }
+
+      return {
+        data: (data as any).answer ? { response: (data as any).answer } : undefined,
+        message: (data as any).message
+      }
+
     } catch (error) {
       return { error: 'Network error. Please try again.' }
     }
-  },
+  }
 }

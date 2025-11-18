@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
+import ReactMarkdown from 'react-markdown'
 import { api } from '@/lib/api'
 
 interface Message {
@@ -14,9 +15,10 @@ export default function ChatInterface() {
     {
       id: '1',
       type: 'ai',
-      text: 'Hello! I\'m your Health AI Assistant. I can help answer your health-related questions. What would you like to know today?',
-    },
+      text: "Hello! I'm your Health AI Assistant. I can help answer your health-related questions. What would you like to know today?"
+    }
   ])
+
   const [input, setInput] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
@@ -37,7 +39,7 @@ export default function ChatInterface() {
     const userMessage: Message = {
       id: Date.now().toString(),
       type: 'user',
-      text: input,
+      text: input
     }
 
     setMessages(prev => [...prev, userMessage])
@@ -54,18 +56,23 @@ export default function ChatInterface() {
     setIsLoading(false)
 
     const aiResponse = result.data?.response || result.error || 'Unable to process your request. Please try again.'
+
     const aiMessage: Message = {
       id: (Date.now() + 1).toString(),
       type: 'ai',
-      text: aiResponse,
+      text: aiResponse
     }
+
     setMessages(prev => [...prev, aiMessage])
   }
 
   return (
     <div className="flex flex-col h-screen" style={{ backgroundColor: '#f3f3f3' }}>
+      
+      {/* Messages Section */}
       <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-4 flex flex-col items-center">
         <div className="w-full max-w-[700px] space-y-4">
+          
           {messages.map(message => (
             <div
               key={message.id}
@@ -79,13 +86,23 @@ export default function ChatInterface() {
                 }`}
                 style={message.type === 'user' ? {} : { borderColor: '#e5e5e5' }}
               >
-                <p className="text-sm md:text-base leading-relaxed">{message.text}</p>
+                {/* Markdown Renderer FIX for v9 */}
+                <div className="prose prose-sm md:prose-base max-w-none">
+                  <ReactMarkdown>
+                    {String(message.text)}
+                  </ReactMarkdown>
+                </div>
               </div>
             </div>
           ))}
+
+          {/* Loading Indicator */}
           {isLoading && (
             <div className="flex justify-start">
-              <div className="bg-white text-foreground px-4 py-3 rounded-lg rounded-bl-none border border-border" style={{ borderColor: '#e5e5e5' }}>
+              <div
+                className="bg-white text-foreground px-4 py-3 rounded-lg rounded-bl-none border border-border"
+                style={{ borderColor: '#e5e5e5' }}
+              >
                 <div className="flex space-x-2">
                   <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce"></div>
                   <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: '100ms' }}></div>
@@ -94,10 +111,12 @@ export default function ChatInterface() {
               </div>
             </div>
           )}
+
           <div ref={messagesEndRef} />
         </div>
       </div>
 
+      {/* Input Box */}
       <div className="border-t border-border p-4 md:p-6" style={{ backgroundColor: '#f3f3f3' }}>
         <form onSubmit={handleSendMessage} className="max-w-[700px] mx-auto flex gap-3">
           <input
@@ -105,7 +124,7 @@ export default function ChatInterface() {
             value={input}
             onChange={e => setInput(e.target.value)}
             placeholder="Ask me a health question..."
-            className="flex-1 px-4 py-3 rounded-lg border border-input bg-white text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-0"
+            className="flex-1 px-4 py-3 rounded-lg border border-input bg-white text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
             disabled={isLoading}
           />
           <button
@@ -117,6 +136,7 @@ export default function ChatInterface() {
           </button>
         </form>
       </div>
+
     </div>
   )
 }

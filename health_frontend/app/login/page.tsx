@@ -40,7 +40,7 @@ export default function LoginPage() {
     if (result.data?.token) {
       console.log("Logged in successfully, token:", result.data.token);
       localStorage.setItem('token', result.data.token)
-      router.push('/home')
+      router.push('/chat')
     }
   }
 
