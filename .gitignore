@@ -1,12 +1,6 @@
-/tmp/*
-/tmp/cache/
-# Ignore key files for decrypting credentials and more.
-/config/credentials/*.key
-
-backend/tmp/cache/bootsnap/*
-backend/.env
-health_frontend/node_modules/
-
-health_frontend/node_modules/
-health_frontend/.next/
-health_frontend/dist/
+health_backend/tmp/*
+health_backend/log/*
+health_backend/.env
+health_backend/config/credentials/production.key
+health_backend/config/credentials/production.yml.enc
+health_backend/log/development.log
