@@ -7,10 +7,12 @@ import { api } from '@/lib/api'
 
 export default function SignupPage() {
   const [formData, setFormData] = useState({
-    name: '',
+    firstName: '',
+    lastName: '',
     email: '',
+    phone: '',
     password: '',
-    confirmPassword: '',
+    passwordConfirmation: '',
   })
   const [error, setError] = useState('')
   const [isLoading, setIsLoading] = useState(false)
@@ -25,23 +27,25 @@ export default function SignupPage() {
     e.preventDefault()
     setError('')
 
-    if (!formData.name || !formData.email || !formData.password || !formData.confirmPassword) {
+    const { firstName, lastName, email, phone, password, passwordConfirmation } = formData
+
+    if (!firstName || !email || !phone || !password || !passwordConfirmation) {
       setError('All fields are required')
       return
     }
 
-    if (formData.password !== formData.confirmPassword) {
+    if (password !== passwordConfirmation) {
       setError('Passwords do not match')
       return
     }
 
-    if (formData.password.length < 6) {
+    if (password.length < 6) {
       setError('Password must be at least 6 characters')
       return
     }
 
     setIsLoading(true)
-    const result = await api.signup(formData.name, formData.email, formData.password)
+    const result = await api.signup(firstName, lastName, email, phone, password, passwordConfirmation)
     setIsLoading(false)
 
     if (result.error) {
@@ -49,9 +53,8 @@ export default function SignupPage() {
       return
     }
 
-    if (result.data?.token) {
-      localStorage.setItem('token', result.data.token)
-      router.push('/home')
+    if (result.data) {
+      router.push('/login')
     }
   }
 
@@ -68,22 +71,41 @@ export default function SignupPage() {
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
+            {/* First Name */}
             <div>
-              <label htmlFor="name" className="block text-sm font-medium text-card-foreground mb-1">
-                Full Name
+              <label htmlFor="firstName" className="block text-sm font-medium text-card-foreground mb-1">
+                First Name
               </label>
               <input
-                id="name"
-                name="name"
+                id="firstName"
+                name="firstName"
                 type="text"
-                placeholder="John Doe"
-                value={formData.name}
+                placeholder="John"
+                value={formData.firstName}
                 onChange={handleChange}
                 disabled={isLoading}
                 className="w-full px-4 py-2 rounded-xl border border-input bg-background text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-50"
               />
             </div>
 
+            {/* Last Name */}
+            <div>
+              <label htmlFor="lastName" className="block text-sm font-medium text-card-foreground mb-1">
+                Last Name
+              </label>
+              <input
+                id="lastName"
+                name="lastName"
+                type="text"
+                placeholder="Doe"
+                value={formData.lastName}
+                onChange={handleChange}
+                disabled={isLoading}
+                className="w-full px-4 py-2 rounded-xl border border-input bg-background text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-50"
+              />
+            </div>
+
+            {/* Email */}
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-card-foreground mb-1">
                 Email
@@ -100,6 +122,24 @@ export default function SignupPage() {
               />
             </div>
 
+            {/* Phone */}
+            <div>
+              <label htmlFor="phone" className="block text-sm font-medium text-card-foreground mb-1">
+                Phone
+              </label>
+              <input
+                id="phone"
+                name="phone"
+                type="tel"
+                placeholder="9962145678"
+                value={formData.phone}
+                onChange={handleChange}
+                disabled={isLoading}
+                className="w-full px-4 py-2 rounded-xl border border-input bg-background text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-50"
+              />
+            </div>
+
+            {/* Password */}
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-card-foreground mb-1">
                 Password
@@ -116,22 +156,24 @@ export default function SignupPage() {
               />
             </div>
 
+            {/* Password Confirmation */}
             <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-card-foreground mb-1">
+              <label htmlFor="passwordConfirmation" className="block text-sm font-medium text-card-foreground mb-1">
                 Confirm Password
               </label>
               <input
-                id="confirmPassword"
-                name="confirmPassword"
+                id="passwordConfirmation"
+                name="passwordConfirmation"
                 type="password"
                 placeholder="••••••"
-                value={formData.confirmPassword}
+                value={formData.passwordConfirmation}
                 onChange={handleChange}
                 disabled={isLoading}
                 className="w-full px-4 py-2 rounded-xl border border-input bg-background text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-50"
               />
             </div>
 
+            {/* Submit */}
             <button
               type="submit"
               disabled={isLoading}
